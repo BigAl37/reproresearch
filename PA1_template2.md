@@ -54,6 +54,7 @@ byDay <- aggregate(steps ~ date, data = activData, sum)
 ### Histogram
 
 ```r
+library(ggplot2)
 ggplot(byDay, aes(steps)) + geom_histogram(fill = "lightblue", colour = "green",
                                            breaks = c(0, 5000, 10000, 15000, 20000, 25000)) + labs(y = expression("frequency")) + 
   labs(x = expression("number of steps per day")) + labs(title = expression("Figure 1"))
@@ -174,6 +175,7 @@ head(activDataNew)
 ## Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ```r
+library(ggplot2)
 ggplot(byDay, aes(steps)) + geom_histogram(fill = "green", colour = "red", 
                                              breaks = c(0, 5000, 10000, 15000, 20000, 25000)) + labs(y = expression("frequency")) + 
   labs(x = expression("number of steps per day")) + labs(title = expression("Figure 3"))
@@ -229,6 +231,7 @@ summary <- aggregate(activDataNew$steps, list(interval = activDataNew$interval, 
 names(summary) <- c("interval", "day", "steps")
 
 ## Plot using ggplot2
+library(ggplot2)
 ggplot(summary, aes(interval, steps)) + geom_line(color = "green", lwd = 1) + 
   facet_wrap(~day, ncol = 1) + labs(title = expression("Figure 4"))
 ```
