@@ -6,14 +6,16 @@ output: html_document
 ---
 
 ## Loading Packages
-```{r}
+
+```r
 library(ggplot2)
 library(plyr)
 ```
 
 ## Loading and preprocessing the data
 ### Download Data
-```{r}
+
+```r
 if(!file.exists("repdata-data-activData.zip")) {
   zipTemp <- tempfile()
   download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",zipTemp)
@@ -27,19 +29,22 @@ if(!file.exists("repdata-data-activData.zip")) {
 
 
 ## Load the data (i.e. read.csv())
-```{r}
+
+```r
 activData <- read.table(workFile, header = T, sep = ",")
 ```
 
 ## Process/transform the data (if necessary) into a format suitable for your analysis
 ### Convert to date
-```{r}
+
+```r
 activData$date <- as.Date(activData$date,  "%Y-%m-%d")
 ```
 
 # What is mean total number of steps taken per day?
 ## Calculate the total number of steps taken per day
-```{r}
+
+```r
 byDay <- aggregate(steps ~ date, data = activData, sum)
 ```
 
@@ -47,30 +52,45 @@ byDay <- aggregate(steps ~ date, data = activData, sum)
 
 ## If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
 ### Histogram
-```{r}
+
+```r
 library(ggplot2)
 ggplot(byDay, aes(steps)) + geom_histogram(fill = "lightblue", colour = "green",
                                            breaks = c(0, 5000, 10000, 15000, 20000, 25000)) + labs(y = expression("frequency")) + 
   labs(x = expression("number of steps per day")) + labs(title = expression("Figure 1"))
 ```
 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
+
 
 
 
 ## Calculate and report the mean and median of the total number of steps taken per day
 ### Mean and Median
-```{r}
+
+```r
 mean1 <- mean(byDay$steps)
 mean1
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 median1 <- median(byDay$steps)
 median1
+```
+
+```
+## [1] 10765
 ```
 
 # What is the average daily activity pattern?
 ## Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ### Time series plot
-```{r}
+
+```r
 byInterval<- aggregate(steps ~ interval, data = activData, FUN = function(x) {
   mean(x, na.rm = TRUE)
 })
@@ -78,30 +98,48 @@ ggplot(byInterval, aes(interval, steps)) + geom_line(colour = "red",
                                                       lwd = 1) + labs(title = expression("Figure 2"))
 ```
 
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+
 
 
 ## Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 ### Maximum interval
-```{r}
+
+```r
 byInterval$interval[which.max(byInterval$steps)]
 ```
 
+```
+## [1] 835
+```
+
 ## Maximum value
-```{r}
+
+```r
 max(byInterval$steps)
+```
+
+```
+## [1] 206.1698
 ```
 
 # Imputing missing values
 ## Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r}
+
+```r
 na <- sum(is.na(activData))
 c("The total number of NAs is: ", na)
+```
+
+```
+## [1] "The total number of NAs is: " "2304"
 ```
 
 
 
 ## Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
-```{r}
+
+```r
 activDataNew <- activData
 for (i in 1:length(activData$steps)) {
   if (is.na(activData[i, 1])) {
@@ -119,17 +157,31 @@ for (i in 1:length(activData$steps)) {
 
 
 ## Create a new dataset that is equal to the original dataset but with the missing data filled in.
-```{r}
+
+```r
 head(activDataNew)
 ```
 
+```
+##       steps       date interval
+## 1 1.7169811 2012-10-01        0
+## 2 0.3396226 2012-10-01        5
+## 3 0.1320755 2012-10-01       10
+## 4 0.1509434 2012-10-01       15
+## 5 0.0754717 2012-10-01       20
+## 6 2.0943396 2012-10-01       25
+```
+
 ## Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
-```{r}
+
+```r
 library(ggplot2)
 ggplot(byDay, aes(steps)) + geom_histogram(fill = "green", colour = "red", 
                                              breaks = c(0, 5000, 10000, 15000, 20000, 25000)) + labs(y = expression("frequency")) + 
   labs(x = expression("number of steps per day")) + labs(title = expression("Figure 3"))
 ```
+
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
 
 
 
@@ -140,7 +192,8 @@ ggplot(byDay, aes(steps)) + geom_histogram(fill = "green", colour = "red",
 
 ## Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 ### Add a column for weekdays
-```{r}
+
+```r
 activDataNew <- mutate(activDataNew, day = weekdays(date))
 ```
 
@@ -148,12 +201,14 @@ activDataNew <- mutate(activDataNew, day = weekdays(date))
 
 
 ### Weekend Variable
-```{r}
+
+```r
 weekendVar <- c("Saturday", "Sunday")
 ```
 
 ### Creates a factor variable with 2 levels
-```{r}
+
+```r
 for (i in 1:length(activDataNew$day)) {
   if (activDataNew[i, 4] == weekendVar[1] || activDataNew[i, 4] == weekendVar[2] ) {
     activDataNew[i, 4] <- "weekend"
@@ -169,7 +224,8 @@ activDataNew$day <- as.factor(activDataNew$day)
 
 
 ## Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
-```{r}
+
+```r
 summary <- aggregate(activDataNew$steps, list(interval = activDataNew$interval, day = activDataNew$day), 
                      mean)
 names(summary) <- c("interval", "day", "steps")
@@ -179,3 +235,5 @@ library(ggplot2)
 ggplot(summary, aes(interval, steps)) + geom_line(color = "green", lwd = 1) + 
   facet_wrap(~day, ncol = 1) + labs(title = expression("Figure 4"))
 ```
+
+![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
